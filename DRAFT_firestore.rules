@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // --- Entity Validations ---
+
+    function isValidUser(data) {
+      return data.uid is string && data.uid.size() <= 128 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.createdAt is string &&
+             data.uid == request.auth.uid;
+    }
+
+    function isValidProduct(data) {
+      return data.name is string && data.name.size() <= 200 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string && data.category.size() <= 100 &&
+             data.image is string && data.image.size() <= 1000;
+    }
+
+    function isValidReview(data) {
+      return data.productId is string && data.productId.size() <= 128 &&
+             data.userName is string && data.userName.size() <= 100 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.comment is string && data.comment.size() <= 1000;
+    }
+
+    function isValidContactMessage(data) {
+      return data.name is string && data.name.size() <= 100 &&
+             data.email is string && data.email.size() <= 256 &&
+             data.message is string && data.message.size() <= 2000 &&
+             data.createdAt == request.time;
+    }
+
+    // --- Collections ---
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming()) && 
+                    incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'phoneNumber']);
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if isEmailVerified() && isValidReview(incoming()) && incoming().productId == productId;
+        allow delete: if isAdmin();
+      }
+    }
+
+    match /contactMessages/{messageId} {
+      allow create: if isValidContactMessage(incoming());
+      allow read: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow read: if isAdmin();
+    }
+  }
+}

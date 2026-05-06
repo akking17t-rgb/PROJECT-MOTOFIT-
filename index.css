@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  
+  --color-brand-primary: #FF4E00;
+  --color-brand-black: #0F172A;
+  --color-brand-gray: #F8FAFC;
+  
+  --spacing-fluid-sm: clamp(1rem, 2vw, 1.5rem);
+  --spacing-fluid-md: clamp(1.5rem, 4vw, 3rem);
+  --spacing-fluid-lg: clamp(3rem, 8vw, 6rem);
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-white text-slate-900 font-sans antialiased selection:bg-brand-primary selection:text-white;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight text-slate-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand-primary text-white font-display font-bold px-6 py-3 lg:px-8 lg:py-4 rounded-xl transition-all duration-300 hover:opacity-90 active:scale-95 shadow-lg shadow-brand-primary/20 flex items-center justify-center gap-2;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-slate-200 text-slate-900 font-display font-bold px-6 py-3 lg:px-8 lg:py-4 rounded-xl transition-all duration-300 hover:bg-slate-50 active:scale-95 flex items-center justify-center gap-2;
+  }
+  
+  .card-gradient {
+    @apply bg-white border border-slate-100 hover:border-brand-primary/30 transition-all duration-500 rounded-2xl shadow-sm hover:shadow-2xl hover:-translate-y-1;
+  }
+  
+  .input-label {
+    @apply font-display text-[0.65rem] uppercase tracking-[0.15em] text-slate-400 mb-2 block font-bold;
+  }
+
+  /* Premium UI Utilities */
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl shadow-slate-200/50;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600;
+  }
+
+  .badge-primary {
+    @apply px-2.5 py-0.5 rounded-full text-[10px] font-display font-bold uppercase tracking-wider bg-brand-primary/10 text-brand-primary border border-brand-primary/20;
+  }
+
+  .section-container {
+    @apply container mx-auto px-4 lg:px-12 py-16 lg:py-24;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee-fast {
+    animation: marquee 25s linear infinite;
+  }
+
+  /* Custom scrollbar for horizontal categories */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

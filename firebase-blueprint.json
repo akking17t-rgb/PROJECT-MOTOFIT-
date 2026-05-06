@@ -1,0 +1,131 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["name", "image"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Vehicle part or accessory",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "number" },
+        "description": { "type": "string" },
+        "image": { "type": "string" },
+        "category": { "type": "string" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "featured": { "type": "boolean" },
+        "type": { "type": "string", "enum": ["Bike", "Car", "Universal"] },
+        "fitment": {
+          "type": "object",
+          "properties": {
+            "brands": { "type": "array", "items": { "type": "string" } },
+            "models": { "type": "array", "items": { "type": "string" } },
+            "years": { "type": "array", "items": { "type": "number" } }
+          }
+        }
+      },
+      "required": ["name", "price", "category", "image"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "User review for a product",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "productId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "vehicle": { "type": "string" }
+      },
+      "required": ["productId", "userName", "rating", "comment"]
+    },
+    "ContactMessage": {
+      "title": "ContactMessage",
+      "description": "Message from the contact form",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "email", "message", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "User purchase order",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "items": { "type": "array" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["Processing", "Shipped", "Delivered", "Cancelled"] },
+        "shippingAddress": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "items", "total", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Customer orders"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Product categories"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Available products"
+    },
+    "/products/{productId}/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Product reviews"
+    },
+    "/contactMessages/{messageId}": {
+      "schema": "ContactMessage",
+      "description": "Contact form submissions"
+    },
+    "/newsletter/{newsletterId}": {
+      "schema": { "type": "object", "properties": { "email": { "type": "string" }, "createdAt": { "type": "string" } } },
+      "description": "Newsletter subscribers"
+    },
+    "/admins/{adminId}": {
+      "schema": { "type": "object", "properties": { "role": { "type": "string" } } },
+      "description": "Admin roles"
+    }
+  }
+}
